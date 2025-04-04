@@ -1,0 +1,10 @@
+ 
+html {
+	height: 100%;
+	/*background: linear-gradient(#480241, #FF823E);*/
+	background-image: url('images/background_texture.png'), linear-gradient(rgba(72, 2, 65, 0.7), rgba(255, 130, 62, 0.7));
+	background-repeat: repeat;
+	/*background-size: auto;*/
+	background-blend-mode: overlay;
+}
+
