@@ -6,13 +6,3 @@ html {
 	/*position: fixed;*/
 	background-attachment: fixed;
 }
-
-body {
-	width: 100%;
-	height: 100%;
-}
-
-#back_img {
-	object-position: right;
-	opacity: 50%;
-}
