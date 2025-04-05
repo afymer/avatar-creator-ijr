@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import './style.css'
 
-function GoToBodiesPage() {
-    return <></>
-}
-
+//=========================================================================================================
+//===============================PAGE 0 (ACCUEIL) =========================================================
+//=========================================================================================================
 function RoseDesVents_home_bg() {
     return (
         <img
@@ -12,18 +11,6 @@ function RoseDesVents_home_bg() {
             id="back_img"
             src="../images/rose_des_vents.png"
         ></img>
-    )
-}
-
-function RoseDesVents_avg_bg() {
-    return (
-        <div className="absolute w-full">
-            <img
-                className="translate-x-[50%] opacity-40 w-[80%] md:w-[50%]"
-                id="back_img"
-                src="../images/half_rose_des_vents.png"
-            ></img>
-        </div>
     )
 }
 
@@ -72,6 +59,22 @@ function SelectionButtons({
     )
 }
 
+//=========================================================================================================
+//===============================PAGE 1 (BODIES) ==========================================================
+//=========================================================================================================
+
+function RoseDesVents_avg_bg() {
+    return (
+        <div className="absolute w-full">
+            <img
+                className="translate-x-[50%] opacity-40 w-[80%] md:w-[50%]"
+                id="back_img"
+                src="../images/half_rose_des_vents.png"
+            ></img>
+        </div>
+    )
+}
+
 function Instruction({ consigne }: { consigne: string }) {
     return (
         <div className="font-title text-center text-amber-100 text-[200%] md:text-[250%] font-bold drop-shadow-[0_0_0.1em_rgba(72,2,65,1)] md:ml-5">
@@ -79,6 +82,28 @@ function Instruction({ consigne }: { consigne: string }) {
                 {consigne}
             </h1>
         </div>
+    )
+}
+
+function Body({ index }: { index: any }) {
+    const body_list = [
+        '../images/bodies/man_silhouette.png',
+        '../images/bodies/woman_silhouette.png',
+        '../images/bodies/neutral_silhouette.png',
+    ]
+
+    return <img className="w-[16%]" src={body_list[index]}></img>
+}
+
+function Bodies() {
+    return (
+        <>
+            <div className="w-full flex items-center justify-around">
+                <Body index={0} />
+                <Body index={1} />
+                <Body index={2} />
+            </div>
+        </>
     )
 }
 
@@ -100,6 +125,7 @@ function App() {
             <>
                 <RoseDesVents_avg_bg />
                 <Instruction consigne={'Choose your class'} />
+                <Bodies />
             </>
         )
     }
