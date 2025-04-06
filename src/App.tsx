@@ -88,18 +88,56 @@ function Instruction({ consigne }: { consigne: string }) {
 function NextButton({
     page,
     setPage,
+    activator,
+}: {
+    page: any
+    setPage: React.Dispatch<React.SetStateAction<number>>
+    activator: any
+}) {
+    if (activator === -1)
+        //if button should be deactivated
+        return (
+            <>
+                <button className="mr-4 h-fit self-end">
+                    <img
+                        className="opacity-40 size-30 self-end"
+                        src="../images/arrows/next.png"
+                    ></img>
+                </button>
+            </>
+        )
+    else
+        return (
+            <>
+                <button className="mr-4 h-fit self-end">
+                    <img
+                        className="opacity-100 size-30 self-end"
+                        src="../images/arrows/next.png"
+                        onClick={() => setPage(page + 1)}
+                    ></img>
+                </button>
+            </>
+        )
+}
+function BackButton({
+    page,
+    setPage,
 }: {
     page: any
     setPage: React.Dispatch<React.SetStateAction<number>>
 }) {
     return (
         <>
-            <button className="h-fit self-end">
-                <img
-                    className="opacity-40 size-30 self-end"
-                    src="../images/next.png"
-                    onClick={() => setPage(page + 1)}
-                ></img>
+            <button className="h-fit ml-4 self-end flex flex-row font-body text-custom_violet text-[300%]">
+                <div className="mt-10 content-stretch font-bold">
+                    Back
+                    <img
+                        className="opacity-100 size-12 relative -top-[5%] left-[50%] -translate-x-[50%]"
+                        src="../images/arrows/back.png"
+                        onClick={() => setPage(page - 1)}
+                    ></img>
+                </div>
+                <div className="text-[300%]">)</div>
             </button>
         </>
     )
@@ -128,7 +166,7 @@ function Body({
                     filter: 'drop-shadow(0 0 1em rgba(255,165,0,1))',
                 }}
                 onClick={(e) => {
-                    selectBody(index)
+                    selectBody(-1)
                 }}
             >
                 <div
@@ -211,15 +249,24 @@ function App() {
             <>
                 <RoseDesVents_avg_bg />
                 <Instruction consigne={'Choose your class'} />
-                <div className="flex flex-row">
+                <div className="flex flex-row h-full grow-0.1">
+                    <BackButton page={page} setPage={setPage} />
                     <Bodies body_id={body_id} setBodyId={setBodyId} />
-                    <NextButton page={page} setPage={setPage} />
+                    <NextButton
+                        page={page}
+                        setPage={setPage}
+                        activator={body_id}
+                    />
                 </div>
             </>
         )
     }
 
-    return <></>
+    return (
+        <>
+            <BackButton page={page} setPage={setPage} />
+        </>
+    )
 }
 
 export default App
