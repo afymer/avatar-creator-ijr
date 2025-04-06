@@ -67,7 +67,7 @@ function RoseDesVents_avg_bg() {
     return (
         <div className="absolute w-full">
             <img
-                className="translate-x-[50%] opacity-40 w-[80%] md:w-[50%]"
+                className="translate-x-[50%] opacity-40 w-[80%] md:w-[50%] -z-10"
                 id="back_img"
                 src="../images/half_rose_des_vents.png"
             ></img>
@@ -85,23 +85,98 @@ function Instruction({ consigne }: { consigne: string }) {
     )
 }
 
-function Body({ index }: { index: any }) {
+function Body({
+    current_selected,
+    index,
+    selectBody,
+}: {
+    current_selected: any
+    index: any
+    selectBody: React.Dispatch<React.SetStateAction<number>>
+}) {
     const body_list = [
         '../images/bodies/man_silhouette.png',
         '../images/bodies/woman_silhouette.png',
         '../images/bodies/neutral_silhouette.png',
     ]
 
-    return <img className="w-[16%]" src={body_list[index]}></img>
+    if (current_selected === index)
+        return (
+            //<img
+            //    className="w-50"
+            //    src={body_list[index]}
+            //    onClick={() => selectBody(index)}
+            //></img>
+            <button
+                className="h-150 w-70"
+                style={{
+                    filter: 'drop-shadow(0 0 1em rgba(255,165,0,1))',
+                }}
+                onClick={(e) => {
+                    selectBody(index)
+                }}
+            >
+                <div
+                    className="mask-contain mask-no-repeat mask-center bg-linear-to-t from-custom_orange to-custom_violet h-full w-full"
+                    style={{
+                        maskImage: `url(${body_list[index]})`,
+                        WebkitMaskImage: `url(${body_list[index]})`,
+                    }}
+                ></div>
+            </button>
+        )
+    else
+        return (
+            //<img
+            //    className="w-50"
+            //    src={body_list[index]}
+            //    onClick={() => selectBody(index)}
+            //></img>
+            <button
+                className="h-150 w-70"
+                style={{
+                    filter: 'drop-shadow(0 0 0.5em rgba(72,2,65,1))',
+                }}
+                onClick={(e) => {
+                    selectBody(index)
+                }}
+            >
+                <div
+                    className="mask-contain mask-no-repeat mask-center bg-linear-to-t from-custom_orange to-custom_violet h-full w-full"
+                    style={{
+                        maskImage: `url(${body_list[index]})`,
+                        WebkitMaskImage: `url(${body_list[index]})`,
+                    }}
+                ></div>
+            </button>
+        )
 }
 
-function Bodies() {
+function Bodies({
+    body_id,
+    setBodyId,
+}: {
+    body_id: any
+    setBodyId: React.Dispatch<React.SetStateAction<number>>
+}) {
     return (
         <>
             <div className="w-full flex items-center justify-around">
-                <Body index={0} />
-                <Body index={1} />
-                <Body index={2} />
+                <Body
+                    current_selected={body_id}
+                    index={0}
+                    selectBody={setBodyId}
+                />
+                <Body
+                    current_selected={body_id}
+                    index={1}
+                    selectBody={setBodyId}
+                />
+                <Body
+                    current_selected={body_id}
+                    index={2}
+                    selectBody={setBodyId}
+                />
             </div>
         </>
     )
@@ -109,6 +184,7 @@ function Bodies() {
 
 function App() {
     const [page, setPage] = useState(0)
+    const [body_id, setBodyId] = useState(-1)
 
     if (page === 0) {
         return (
@@ -125,7 +201,7 @@ function App() {
             <>
                 <RoseDesVents_avg_bg />
                 <Instruction consigne={'Choose your class'} />
-                <Bodies />
+                <Bodies body_id={body_id} setBodyId={setBodyId} />
             </>
         )
     }
