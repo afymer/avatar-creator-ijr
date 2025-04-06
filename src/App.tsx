@@ -77,12 +77,22 @@ function RoseDesVents_avg_bg() {
 
 function Instruction({ consigne }: { consigne: string }) {
     return (
-        <div className="font-title text-center text-amber-100 text-[200%] md:text-[250%] font-bold drop-shadow-[0_0_0.1em_rgba(72,2,65,1)] md:ml-5">
+        <div className="font-title text-center text-amber-100 text-[200%] md:text-[250%] font-bold drop-shadow-[0_0_0.1em_rgba(72,2,65,1)] md:m-5">
             <h1 className="-top-45 text-5xl md:top-0 md:text-8xl relative font-title">
                 {consigne}
             </h1>
         </div>
     )
+}
+
+function NextButton({
+    page,
+    setPage,
+}: {
+    page: any
+    setPage: React.Dispatch<React.SetStateAction<number>>
+}) {
+    return <></>
 }
 
 function Body({
@@ -102,11 +112,6 @@ function Body({
 
     if (current_selected === index)
         return (
-            //<img
-            //    className="w-50"
-            //    src={body_list[index]}
-            //    onClick={() => selectBody(index)}
-            //></img>
             <button
                 className="h-150 w-70"
                 style={{
@@ -127,11 +132,6 @@ function Body({
         )
     else
         return (
-            //<img
-            //    className="w-50"
-            //    src={body_list[index]}
-            //    onClick={() => selectBody(index)}
-            //></img>
             <button
                 className="h-150 w-70"
                 style={{
@@ -202,6 +202,7 @@ function App() {
                 <RoseDesVents_avg_bg />
                 <Instruction consigne={'Choose your class'} />
                 <Bodies body_id={body_id} setBodyId={setBodyId} />
+                <NextButton page={page} setPage={setPage} />
             </>
         )
     }
