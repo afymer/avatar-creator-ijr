@@ -1,0 +1,32 @@
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    margin: 5px 0;
+    background-color: transparent;
+    border: 1px solid #000000;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.menu-item:hover {
+    background-color: #e6e6e6;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.menu-item:active {
+    border: 2px solid #480241;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* .menu-item-icon {
+    margin-right: 10px;
+    font-size: 1.2em;
+    color: #555;
+}
+
+.menu-item-text {
+    font-size: 1em;
+    color: #333;
+} */
