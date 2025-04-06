@@ -60,7 +60,7 @@ function SelectionButtons({
 }
 
 //=========================================================================================================
-//===============================PAGE 1 (BODIES) ==========================================================
+//===============================PAGE 2 (BODIES) ==========================================================
 //=========================================================================================================
 
 function RoseDesVents_avg_bg() {
@@ -98,7 +98,7 @@ function NextButton({
         //if button should be deactivated
         return (
             <>
-                <button className="mr-4 h-fit self-end">
+                <button className="h-fit mr-4 self-end">
                     <img
                         className="opacity-40 size-30 self-end"
                         src="../images/arrows/next.png"
@@ -230,8 +230,57 @@ function Bodies({
     )
 }
 
+//=========================================================================================================
+//===============================PAGE 1 (CLASSES) ==========================================================
+//=========================================================================================================
+function Classes({
+    class_id,
+    setClassId,
+}: {
+    class_id: any
+    setClassId: React.Dispatch<React.SetStateAction<number>>
+}) {
+    return (
+        <>
+            <div className="w-full flex items-center justify-around flex-row">
+                <Class
+                    current_selected={class_id}
+                    index={0}
+                    selectBody={setClassId}
+                />
+                <Class
+                    current_selected={class_id}
+                    index={1}
+                    selectBody={setClassId}
+                />
+                <Class
+                    current_selected={class_id}
+                    index={2}
+                    selectBody={setClassId}
+                />
+                <Class
+                    current_selected={class_id}
+                    index={3}
+                    selectBody={setClassId}
+                />
+                <Class
+                    current_selected={class_id}
+                    index={4}
+                    selectBody={setClassId}
+                />
+                <Class
+                    current_selected={class_id}
+                    index={5}
+                    selectBody={setClassId}
+                />
+            </div>
+        </>
+    )
+}
+
 function App() {
     const [page, setPage] = useState(0)
+    const [class_id, setClassId] = useState(-1)
     const [body_id, setBodyId] = useState(-1)
 
     if (page === 0) {
@@ -244,12 +293,29 @@ function App() {
                 </div>
             </>
         )
-    } else if (page === 1) {
+    } else if (page === 200) {
+        //not working at the moment
         return (
             <>
                 <RoseDesVents_avg_bg />
                 <Instruction consigne={'Choose your class'} />
-                <div className="flex flex-row h-full grow-0.1">
+                <div className="flex flex-row h-full grow-0.1 mt-10">
+                    <BackButton page={page} setPage={setPage} />
+                    <Classes class_id={class_id} setClassId={setClassId} />
+                    <NextButton
+                        page={page}
+                        setPage={setPage}
+                        activator={class_id}
+                    />
+                </div>
+            </>
+        )
+    } else if (page === 1) {
+        return (
+            <>
+                <RoseDesVents_avg_bg />
+                <Instruction consigne={'Choose your body'} />
+                <div className="flex flex-row h-full grow-0.1 mt-10">
                     <BackButton page={page} setPage={setPage} />
                     <Bodies body_id={body_id} setBodyId={setBodyId} />
                     <NextButton
