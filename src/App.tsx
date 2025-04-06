@@ -92,7 +92,17 @@ function NextButton({
     page: any
     setPage: React.Dispatch<React.SetStateAction<number>>
 }) {
-    return <></>
+    return (
+        <>
+            <button className="h-fit self-end">
+                <img
+                    className="opacity-40 size-30 self-end"
+                    src="../images/next.png"
+                    onClick={() => setPage(page + 1)}
+                ></img>
+            </button>
+        </>
+    )
 }
 
 function Body({
@@ -161,7 +171,7 @@ function Bodies({
 }) {
     return (
         <>
-            <div className="w-full flex items-center justify-around">
+            <div className="w-full flex items-center justify-around flex-row">
                 <Body
                     current_selected={body_id}
                     index={0}
@@ -201,8 +211,10 @@ function App() {
             <>
                 <RoseDesVents_avg_bg />
                 <Instruction consigne={'Choose your class'} />
-                <Bodies body_id={body_id} setBodyId={setBodyId} />
-                <NextButton page={page} setPage={setPage} />
+                <div className="flex flex-row">
+                    <Bodies body_id={body_id} setBodyId={setBodyId} />
+                    <NextButton page={page} setPage={setPage} />
+                </div>
             </>
         )
     }
