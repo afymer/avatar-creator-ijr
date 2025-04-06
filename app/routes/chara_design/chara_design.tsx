@@ -75,6 +75,7 @@ function SelectionMenu({ name, setFace }: { name: FeatureKey, setFace: React.Dis
     if (!features) {
         return null; // Si le nom ne correspond à aucun élément de la liste, ne rien afficher
     }
+    console.log(`Selected features for ${name}:`, features);
     return (
         <div className='feature-menu'>
             {features.map((feature, index) => (
@@ -96,14 +97,10 @@ function SelectionMenuItem({ image, parent, name, setFace }: { image: string, pa
             ...prevFace,
             [parent]: name, // Met à jour la propriété correspondante dans l'objet Face
         }));
-        return (
-            <div className='menu-item' onClick={handleClick}>
-                <img src={image} alt={name} />
-            </div>
-        )
     }
     return (
         <div className='menu-item' onClick={handleClick}>
+            <img src={image} alt={name} />
         </div>
     )
 
@@ -113,11 +110,11 @@ function SelectionMenuItem({ image, parent, name, setFace }: { image: string, pa
 function FaceRender({ current_face }: { current_face: Face }) { // Le rendu du visage au centre de l'écran
 
     return (
-        <div className='face-render relative ' style={{ width: '100%', height: '100%' }}>
+        <div className='face-render relative w-full '>
             <img
                 src={`/images/face.png`}
                 alt="base_skin"
-                style={{ position: 'absolute', top: '0', left: '0', width: '100%', height: '100%' }}
+                style={{ position: 'absolute', top: '0', left: '0', width: '100%' }}
             />
             <img
                 src={`/images/mouth/${current_face.mouth}.png`}
@@ -150,15 +147,17 @@ export default function FaceDesign() {
     const [current_menu, setCurrentSelectionMenu] = useState<FeatureKey>('empty');
     return (
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <div style={{ width: '30%' }}>
-                <h1>Character Design</h1>
+            <div style={{ width: '15%' }}>
                 <MainMenu setFace={setFace} setCurrentSelectionMenu={setCurrentSelectionMenu} />
             </div>
-            <div style={{ width: '30%' }}>
+            <div style={{ width: '15%' }}>
+                <SelectionMenu name={current_menu} setFace={setFace} />
+            </div>
+
+            <div style={{ width: '40%' }}>
                 <FaceRender current_face={current_face} />
             </div>
-            <div style={{ width: '40%' }}>
-                <SelectionMenu name={current_menu} setFace={setFace} />
+            <div style={{ width: '30%' }}>
             </div>
 
         </div>
