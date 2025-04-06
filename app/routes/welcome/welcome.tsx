@@ -14,7 +14,7 @@ export function meta({}: Route.MetaArgs) {
 function RoseDesVents({ className }: { className?: string }) {
     return (
         <img
-            className={cn('opacity-30 absolute md:w-2/3', className)}
+            className={cn('opacity-30 md:w-2/3', className)}
             src="/images/rose_des_vents.png"
         ></img>
     )
@@ -62,7 +62,7 @@ function SelectionButtons() {
 function CharactersCarousel() {
     return (
         <div className="flex-1 relative">
-            <RoseDesVents className="absolute left-1/2 bottom-0 scale-200 -translate-x-1/2 blur-[2px]" />
+            <RoseDesVents className="fixed -bottom-1/100 md:-bottom-3/20 -left-2/5 md:-left-1/5 w-7xl md:w-4/5 blur-[2px]" />
             <div className="">
                 <img
                     src="/images/welcome/character2.png"
@@ -89,10 +89,10 @@ function CharactersCarousel() {
 
 export default function App() {
     return (
-        <div className="flex flex-row h-full">
+        <div className="flex flex-row h-full font-body">
             <CharactersCarousel />
             <div className="relative h-full min-w-[30%] text-amber-100 flex flex-col justify-between p-4 py-[10%]">
-                <RoseDesVents className="absolute top-0 right-0 -rotate-12 blur-[2px]" />
+                <RoseDesVents className="absolute opacity-90 top-20 right-0 -rotate-12 blur-[1px]" />
                 <MainTitle />
                 <SelectionButtons />
             </div>
