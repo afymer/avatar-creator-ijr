@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useEffect } from 'react';
 
 type Face = {
     hair: string;
@@ -8,62 +9,112 @@ type Face = {
     //skin: string;
 }
 
-function BackButton() {
-    return (
-        <button onClick={() => window.history.back()}>Back</button>
-    );
+const FeaturesList = {
+    hair: ['hair1', 'hair2'],
+    eyes: ['eyes1', 'eyes2', 'eyes3', 'eyes4'],
+    mouth: ['mouth1', 'mouth2', 'mouth3', 'mouth4'],
 }
 
-function NextButton() {
-    return (
-        <button onClick={() => console.log('Next')}>Next</button>
-    );
-}
+// function BackButton() {
+//     return (
+//         <button onClick={() => window.history.back()}>Back</button>
+//     );
+// }
+
+// function NextButton() {
+//     return (
+//         <button onClick={() => console.log('Next')}>Next</button>
+//     );
+// }
 
 
 // Le 1er niveau de l'arborescence, on choisit l'élément physique à modifier (ex: cheveux, yeux, etc.)
-function MainMenu(setFace: React.Dispatch<React.SetStateAction<Face>>) {
+function MainMenu({ setFace, setCurrentSelectionMenu }: { setFace: React.Dispatch<React.SetStateAction<Face>>, setCurrentSelectionMenu: React.Dispatch<React.SetStateAction<string>> }) {
     return (
-        <div>
-            <h1>Selection Menu</h1>
-            MenuItem({image: 'path/to/hair.png', name: 'Hair', level: 0});
-            MenuItem({image: 'path/to/eyes.png', name: 'Eyes', level: 1});
-            MenuItem({image: 'path/to/mouth.png', name: 'Mouth', level: 2});
+        <div className='main-menu'>
+            <MainMenuItem
+                image='/images/hair.png'
+                name='Hair'
+                setCurrentMenu={setCurrentSelectionMenu}
+            />
+            <MainMenuItem
+                image='/images/eyes.png'
+                name='Eyes'
+                setCurrentMenu={setCurrentSelectionMenu}
+            />
+            <MainMenuItem
+                image='/images/mouth.png'
+                name='Mouth'
+                setCurrentMenu={setCurrentSelectionMenu}
+            />
         </div>
     );
 }
 
-function FeatureMenu(name: string, image: ) { // Un sous-menu qui affiche les différentes options pour chaque élément physique
+function MainMenuItem({ image, name, setCurrentMenu: setCurrentSelectionMenu }: { image: string, name: string, setCurrentMenu: React.Dispatch<React.SetStateAction<string>> }) {
+    const handleClick = () => {
+        setCurrentSelectionMenu(name);
+    };
+
     return (
-        <div>
-            <h1>Menu</h1>
-            <MenuItem />
-            <MenuItem />
-            <MenuItem />
+        <div className='menu-item' onClick={handleClick}>
+            <img src={image} alt={name} />
         </div>
     );
 }
 
-function MenuItem({ image, name, level, parent }: { image: string; name: string; level: number; parent?: string }) {
+// Un sous-menu qui affiche les différentes options pour chaque élément physique
+
+function SelectionMenu({ name, setFace }: { name: string, setFace: React.Dispatch<React.SetStateAction<Face>> }) {
+    const features = FeaturesList[name as keyof typeof FeaturesList];
+
+    if (!features) {
+        return null; // Si le nom ne correspond à aucun élément de la liste, ne rien afficher
+    }
     return (
-        <div>
-            <img src={image} alt={`${name} icon`} style={{ width: '50px', height: '50px' }} />
-            <h2>{name}</h2>
-            <p>Level: {level}</p>
-            {parent && <p>Parent: {parent}</p>}
+        <div className='feature-menu'>
+            {features.map((feature, index) => (
+                <SelectionMenuItem
+                    image={`/images/${name}/${feature}.png`}
+                    parent={name}
+                    name={feature}
+                    setFace={setFace}
+                />
+            ))}
         </div>
     );
 }
 
-function FaceRender() { // Le rendu du visage au centre de l'écran
+function SelectionMenuItem({ image, parent, name, setFace }: { image: string, parent: string, name: string, setFace: React.Dispatch<React.SetStateAction<Face>> }) {
+    const handleClick = () => {
+        setFace((prevFace) => ({
+            ...prevFace,
+            [parent]: name, // Met à jour la propriété correspondante dans l'objet Face
+        }));
+        return (
+            <div className='menu-item' onClick={handleClick}>
+                <img src={image} alt={name} />
+            </div>
+        )
+    }
+    return (
+        <div className='menu-item' onClick={handleClick}>
+        </div>
+    )
+
+}
+
+
+function FaceRender({ current_face }: { current_face: Face }) { // Le rendu du visage au centre de l'écran
     return (
         <div>
-            <h1>Main Render</h1>
-            <img src="path/to/face.png" alt="Face" style={{ width: '200px', height: '200px' }} />
-            <h2>Face Details</h2>
-            <p>Hair: {face.hair}</p>
-            <p>Eyes: {face.eyes}</p>
-            <p>Mouth: {face.mouth}</p>
+            <ul>
+                {Object.entries(current_face).map(([key, value]) => (
+                    <li key={key}>
+                        {key}: {value}
+                    </li>
+                ))}
+            </ul>
         </div>
     );
 }
@@ -72,16 +123,17 @@ function FaceRender() { // Le rendu du visage au centre de l'écran
 
 export default function FaceDesign() {
     const [current_face, setFace] = useState<Face>({
-        hair: 'short',
-        eyes: 'blue',
-        mouth: 'smile',
+        hair: 'hair1',
+        eyes: 'eyes1',
+        mouth: 'mouth1',
     });
-
-
+    const [current_menu, setCurrentSelectionMenu] = useState('Empty');
     return (
         <div>
             <h1>Character Design</h1>
-            <SelectionMenu />
+            <MainMenu setFace={setFace} setCurrentSelectionMenu={setCurrentSelectionMenu} />
+            <SelectionMenu name={current_menu} setFace={setFace} />
+            <FaceRender current_face={current_face} />
         </div>
     );
 }

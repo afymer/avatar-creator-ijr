@@ -10,6 +10,13 @@
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
+.menu-item>img {
+    width: 50px;
+    height: 50px;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
 .menu-item:hover {
     background-color: #e6e6e6;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
