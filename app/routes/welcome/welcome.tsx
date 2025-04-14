@@ -1,8 +1,8 @@
-import './style.css'
-import type { Route } from './+types/welcome'
 import { FaPlus } from 'react-icons/fa'
 import { Button } from '~/components/ui/button'
 import { cn } from '~/lib/utils'
+import type { Route } from './+types/welcome'
+import './style.css'
 
 export function meta({}: Route.MetaArgs) {
     return [
@@ -44,6 +44,9 @@ function SelectionButtons() {
                 variant="outline"
                 size="default"
                 className="flex w-fit h-auto place-items-center cursor-pointer"
+                onClick={() => {
+                    window.location.href = 'body'
+                }}
             >
                 <FaPlus />
                 <div className="text-3xl">Create a character</div>

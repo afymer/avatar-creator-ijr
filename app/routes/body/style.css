@@ -1,0 +1,20 @@
+html {
+    height: 100dvh;
+}
+
+body {
+    height: 100dvh;
+    background-image: linear-gradient(
+            rgba(72, 2, 65, 0.7),
+            rgba(255, 130, 62, 0.7)
+        ),
+        url('/images/background_texture.png');
+    background-blend-mode: add;
+    background-attachment: fixed;
+    overflow: hidden;
+}
+
+#back_img {
+    object-position: right;
+    opacity: 50%;
+}

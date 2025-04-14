@@ -117,7 +117,7 @@ function NextButton({
                     ></img>
                 </button>
             </>
-        )
+        )w-full h-full
 }
 function BackButton({
     page,
