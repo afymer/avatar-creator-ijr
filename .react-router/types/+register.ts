@@ -9,4 +9,5 @@ declare module "react-router" {
 type Params = {
   "/": {};
   "/body": {};
+  "/chara_design": {};
 };
