@@ -52,7 +52,7 @@ function NextButton({ activator }: { activator: any }) {
                         className="opacity-100 size-30 self-end"
                         src="/images/arrows/next.png"
                         onClick={() => {
-                            //window.location.href = 'clothes'
+                            window.location.href = 'chara_design'
                         }}
                     ></img>
                 </button>
