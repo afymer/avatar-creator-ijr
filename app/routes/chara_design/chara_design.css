@@ -10,7 +10,11 @@
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.menu-item > img {
+.grayed-out {
+    background-color: rgba(128, 128, 128, 0.5);
+}
+
+.menu-item>img {
     width: 50px;
     height: 50px;
     border-radius: 5px;
@@ -22,21 +26,14 @@
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.menu-item:active {
-    border: 2px solid #480241;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
-
 html {
     height: 100dvh;
 }
 
 body {
     height: 100dvh;
-    background-image: linear-gradient(
-            rgba(72, 2, 65, 0.7),
-            rgba(255, 130, 62, 0.7)
-        ),
+    background-image: linear-gradient(rgba(72, 2, 65, 0.7),
+            rgba(255, 130, 62, 0.7)),
         url('/images/background_texture.png');
     background-blend-mode: add;
     background-attachment: fixed;
