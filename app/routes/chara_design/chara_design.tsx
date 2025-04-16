@@ -22,7 +22,11 @@ type FeatureKey = keyof typeof FeaturesList
 function ColorWheel() {
     return (
         <>
-            <canvas id="canvas" className="w-[100%] h-auto mb-10"></canvas>
+            <canvas
+                id="canvas"
+                className="absolute translate-x-[-50%] top-[50%] right-[5%] scale-3d"
+                //className="absolute left-[50%] translate-x-[-50%] translate-y-[-50%] h-auto mb-10"
+            ></canvas>
             {/*<div id="answer"> </div>*/}
             <script
                 dangerouslySetInnerHTML={{
@@ -826,11 +830,8 @@ export default function FaceDesign() {
                         borderRadius: '8px',
                     }}
                 >
-                    {/* Placeholder */}
+                    <ColorWheel />
                 </div>
-            </div>
-            <div className="h-full w-10%">
-                <ColorWheel />
             </div>
             <NextButton />
         </div>
