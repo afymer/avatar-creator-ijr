@@ -60,11 +60,13 @@ function NextButton() {
 function MainMenu({
     setFace,
     setCurrentSelectionMenu,
+    currentSelection,
 }: {
     setFace: React.Dispatch<React.SetStateAction<Face>>
     setCurrentSelectionMenu: React.Dispatch<
         React.SetStateAction<'empty' | 'hair' | 'eyes' | 'mouth'>
     >
+    currentSelection: FeatureKey
 }) {
     return (
         <div className="main-menu">
@@ -72,16 +74,19 @@ function MainMenu({
                 image="/images/hair/hair1.png"
                 name="hair"
                 setCurrentSelectionMenu={setCurrentSelectionMenu}
+                currentSelection={currentSelection}
             />
             <MainMenuItem
                 image="/images/eyes/eyes1.png"
                 name="eyes"
                 setCurrentSelectionMenu={setCurrentSelectionMenu}
+                currentSelection={currentSelection}
             />
             <MainMenuItem
                 image="/images/mouth/mouth1.png"
                 name="mouth"
                 setCurrentSelectionMenu={setCurrentSelectionMenu}
+                currentSelection={currentSelection}
             />
         </div>
     )
@@ -90,13 +95,15 @@ function MainMenu({
 function MainMenuItem({
     image,
     name,
-    setCurrentSelectionMenu: setCurrentSelectionMenu,
+    setCurrentSelectionMenu,
+    currentSelection,
 }: {
     image: string
     name: FeatureKey
     setCurrentSelectionMenu: React.Dispatch<
         React.SetStateAction<'empty' | 'hair' | 'eyes' | 'mouth'>
     >
+    currentSelection: FeatureKey
 }) {
     const handleClick = () => {
         setCurrentSelectionMenu(name)
@@ -104,34 +111,43 @@ function MainMenuItem({
     }
 
     return (
-        <div className="menu-item" onClick={handleClick}>
+        <div
+            className={`menu-item ${currentSelection === name ? 'grayed-out' : ''}`}
+            onClick={handleClick}
+            style={{
+                opacity: currentSelection === name ? 0.5 : 1, // Griser si sélectionné
+                pointerEvents: currentSelection === name ? 'none' : 'auto', // Désactiver les clics si sélectionné
+            }}
+        >
             <img src={image} alt={name} />
         </div>
     )
 }
-
 // Un sous-menu qui affiche les différentes options pour chaque élément physique
 
 function SelectionMenu({
     name,
     setFace,
+    currentFace,
 }: {
     name: FeatureKey
     setFace: React.Dispatch<React.SetStateAction<Face>>
+    currentFace: Face
 }) {
-    const features = FeaturesList[name] // Utilisation de 'keyof' pour s'assurer que 'name' est une clé valide de 'FeaturesList'
+    const features = FeaturesList[name]
     if (!features) {
-        return null // Si le nom ne correspond à aucun élément de la liste, ne rien afficher
+        return null
     }
     return (
         <div className="feature-menu">
-            {features.map((feature, index) => (
+            {features.map((feature) => (
                 <SelectionMenuItem
                     key={`${name}-${feature}`}
                     image={`/images/${name}/${feature}.png`}
                     parent={name}
                     name={feature}
                     setFace={setFace}
+                    currentFace={currentFace}
                 />
             ))}
         </div>
@@ -143,32 +159,49 @@ function SelectionMenuItem({
     parent,
     name,
     setFace,
+    currentFace,
 }: {
     image: string
     parent: string
     name: string
     setFace: React.Dispatch<React.SetStateAction<Face>>
+    currentFace: Face
 }) {
     const handleClick = () => {
         setFace((prevFace) => ({
             ...prevFace,
             [parent]: name, // Met à jour la propriété correspondante dans l'objet Face
         }))
-        return (
-            <div className="menu-item" onClick={handleClick}>
-                <img src={image} alt={name} />
-            </div>
-        )
     }
-    return <div className="menu-item" onClick={handleClick}></div>
-}
-
-function FaceRender({ current_face }: { current_face: Face }) {
-    // Le rendu du visage au centre de l'écran
 
     return (
         <div
-            className="face-render relative "
+            className={`menu-item ${currentFace[parent as keyof Face] === name ? 'grayed-out' : ''}`}
+            onClick={handleClick}
+            style={{
+                opacity: currentFace[parent as keyof Face] === name ? 0.5 : 1, // Griser si appliqué
+                pointerEvents: currentFace[parent as keyof Face] === name ? 'none' : 'auto', // Désactiver les clics si appliqué
+            }}
+        >
+            <img src={image} alt={name} />
+        </div>
+    )
+}
+
+function FaceRender({
+    current_face,
+    mouthPosition,
+    mouthSize,
+    eyesSize,
+}: {
+    current_face: Face;
+    mouthPosition: number;
+    mouthSize: number;
+    eyesSize: number
+}) {
+    return (
+        <div
+            className="face-render relative"
             style={{ width: '100%', height: '100%' }}
         >
             <img
@@ -189,9 +222,9 @@ function FaceRender({ current_face }: { current_face: Face }) {
                 style={{
                     position: 'absolute',
                     left: '50%',
-                    top: 53 + 0 + '%',
+                    top: `${mouthPosition}%`, // Utilisation de la position verticale
                     transform: 'translate(-50%, -50%)',
-                    height: '5%',
+                    height: `${mouthSize}%`, // Utilisation de la taille
                     width: 'auto',
                 }}
             />
@@ -201,9 +234,9 @@ function FaceRender({ current_face }: { current_face: Face }) {
                 style={{
                     position: 'absolute',
                     left: '50%',
-                    top: 50 - 5 + '%',
+                    top: '45%',
                     transform: 'translate(-50%, -50%)',
-                    height: '13%',
+                    height: `${eyesSize}%`,
                     width: 'auto',
                 }}
             />
@@ -213,14 +246,14 @@ function FaceRender({ current_face }: { current_face: Face }) {
                 style={{
                     position: 'absolute',
                     left: '50%',
-                    top: current_face.hair === 'hair1' ? '49%' : 47 + '%',
+                    top: current_face.hair === 'hair1' ? '49%' : '47%',
                     transform: 'translate(-50%, -50%)',
-                    height: current_face.hair === 'hair1' ? '40%' : 34 + '%',
+                    height: current_face.hair === 'hair1' ? '40%' : '34%',
                     width: 'auto',
                 }}
             />
         </div>
-    )
+    );
 }
 
 export default function FaceDesign() {
@@ -228,30 +261,135 @@ export default function FaceDesign() {
         hair: 'hair1',
         eyes: 'eyes1',
         mouth: 'mouth1',
-    })
-    const [current_menu, setCurrentSelectionMenu] =
-        useState<FeatureKey>('empty')
+    });
+    const [current_menu, setCurrentSelectionMenu] = useState<FeatureKey>('empty');
+
+    // Nouveaux états pour la position verticale et la taille de la bouche
+    const [mouthPosition, setMouthPosition] = useState(53); // Position verticale en pourcentage
+    const [mouthSize, setMouthSize] = useState(5); // Taille en pourcentage
+    const [eyesSize, setEyesSize] = useState(13); // Taille en pourcentage
+
     return (
         <div
-            className="flex-1 h-full"
-            style={{ display: 'flex', justifyContent: 'space-between' }}
+            className="flex-1 h-full flex flex-row"
+            style={{ padding: '20px', gap: '20px' }}
         >
-            <BackButton />
-            <div style={{ width: '20%' }}>
-                <h1>Character Design</h1>
+            <div
+                className="flex flex-col justify-start items-stretch gap-4"
+                style={{ width: '30%' }} // Le menu occupe toujours 30% de la largeur
+            >
                 <MainMenu
                     setFace={setFace}
                     setCurrentSelectionMenu={setCurrentSelectionMenu}
+                    currentSelection={current_menu}
+                />
+                <SelectionMenu
+                    name={current_menu}
+                    setFace={setFace}
+                    currentFace={current_face}
                 />
             </div>
-            <div style={{ width: '20%' }}>
-                <SelectionMenu name={current_menu} setFace={setFace} />
-            </div>
-            <div style={{ width: '60%' }}>
-                <FaceRender current_face={current_face} />
+
+            <div
+                className="flex justify-center items-center"
+                style={{
+                    width: '40%',
+                    height: '70vh',
+                }}
+            >
+                <FaceRender
+                    current_face={current_face}
+                    mouthPosition={mouthPosition}
+                    mouthSize={mouthSize}
+                    eyesSize={eyesSize}
+                />
             </div>
 
-            <NextButton />
+            <div
+                className="flex flex-col gap-4"
+                style={{ width: '30%' }}
+            >
+                <div
+                    className="flex flex-col gap-2"
+                    style={{ height: '25%' }}
+                >
+                    <label className="flex flex-col items-start">
+                        <span>Hauteur de la bouche :</span>
+                        <input
+                            type="range"
+                            min="50"
+                            max="53"
+                            step="0.1"
+                            value={mouthPosition}
+                            onChange={(e) => setMouthPosition(Number(e.target.value))}
+                            className="slider"
+                            style={{
+                                appearance: 'none',
+                                width: '100%',
+                                height: '8px',
+                                borderRadius: '5px',
+                                background: '#ddd',
+                                outline: 'none',
+                                opacity: '0.9',
+                                transition: 'opacity 0.2s',
+                            }}
+                        />
+                    </label>
+                    <label className="flex flex-col items-start">
+                        <span>Taille de la bouche :</span>
+                        <input
+                            type="range"
+                            min="3"
+                            max="10"
+                            step="0.1"
+                            value={mouthSize}
+                            onChange={(e) => setMouthSize(Number(e.target.value))}
+                            className="slider"
+                            style={{
+                                appearance: 'none',
+                                width: '100%',
+                                height: '8px',
+                                borderRadius: '5px',
+                                background: '#ddd',
+                                outline: 'none',
+                                opacity: '0.9',
+                                transition: 'opacity 0.2s',
+                            }}
+                        />
+                    </label>
+                    <label className="flex flex-col items-start">
+                        <span>Taille des yeux :</span>
+                        <input
+                            type="range"
+                            min="5"
+                            max="18"
+                            step="0.1"
+                            value={eyesSize}
+                            onChange={(e) => setEyesSize(Number(e.target.value))}
+                            className="slider"
+                            style={{
+                                appearance: 'none',
+                                width: '100%',
+                                height: '8px',
+                                borderRadius: '5px',
+                                background: '#ddd',
+                                outline: 'none',
+                                opacity: '0.9',
+                                transition: 'opacity 0.2s',
+                            }}
+                        />
+                    </label>
+                </div>
+                <div
+                    className="flex-1"
+                    style={{
+                        backgroundColor: '#f0f0f0',
+                        borderRadius: '8px',
+                    }}
+                >
+                    {/* Placeholder */}
+                </div>
+            </div>
         </div>
-    )
+    );
 }
