@@ -22,12 +22,12 @@ type FeatureKey = keyof typeof FeaturesList
 function ColorWheel() {
     return (
         <>
-            <canvas id="canvas" className="w-[60%] h-auto mb-10"></canvas>
-            <div id="answer"> </div>
+            <canvas id="canvas" className="w-[100%] h-auto mb-10"></canvas>
+            {/*<div id="answer"> </div>*/}
             <script
                 dangerouslySetInnerHTML={{
                     __html: `
-                        let radius = 75;
+                        let radius = 50;
                         let canvas = document.getElementById('canvas');
                         let ctx = canvas.getContext('2d');
                         let image = ctx.createImageData(2*radius, 2*radius);
@@ -57,7 +57,7 @@ function ColorWheel() {
                             const updatedStyle = currentStyle.replace(/filter:[^;]*;/, '') + 'filter: ' + result.filter + ';';
                             eyes.setAttribute('style', updatedStyle);
 
-                            document.getElementById('answer').textContent = rgbColor;
+                            //document.getElementById('answer').textContent = rgbColor;
                         }
 
                         canvas.addEventListener('click', (event) => pick(event));
@@ -710,19 +710,23 @@ export default function FaceDesign() {
         >
             <BackButton />
             <div
-                className="flex flex-col justify-start items-stretch gap-4"
+                className="flex flex-row justify-start items-stretch gap-4"
                 style={{ width: '30%' }} // Le menu occupe toujours 30% de la largeur
             >
-                <MainMenu
-                    setFace={setFace}
-                    setCurrentSelectionMenu={setCurrentSelectionMenu}
-                    currentSelection={current_menu}
-                />
-                <SelectionMenu
-                    name={current_menu}
-                    setFace={setFace}
-                    currentFace={current_face}
-                />
+                <div style={{ width: '50%' }}>
+                    <MainMenu
+                        setFace={setFace}
+                        setCurrentSelectionMenu={setCurrentSelectionMenu}
+                        currentSelection={current_menu}
+                    />
+                </div>
+                <div style={{ width: '50%' }}>
+                    <SelectionMenu
+                        name={current_menu}
+                        setFace={setFace}
+                        currentFace={current_face}
+                    />
+                </div>
             </div>
 
             <div
