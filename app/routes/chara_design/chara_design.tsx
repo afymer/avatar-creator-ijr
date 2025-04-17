@@ -18,7 +18,7 @@ const FeaturesList = {
     hair: ['hair1', 'hair2'],
     eyes: ['eyes1', 'eyes2', 'eyes3', 'eyes4'],
     mouth: ['mouth1', 'mouth2', 'mouth3', 'mouth4'],
-    noses: ['nose1', 'nose2'],
+    nose: ['nose1', 'nose2'],
 }
 
 type FeatureKey = keyof typeof FeaturesList
@@ -79,7 +79,7 @@ function MainMenu({
 }: {
     setFace: React.Dispatch<React.SetStateAction<Face>>
     setCurrentSelectionMenu: React.Dispatch<
-        React.SetStateAction<'empty' | 'hair' | 'eyes' | 'mouth' | 'noses'>
+        React.SetStateAction<'empty' | 'hair' | 'eyes' | 'mouth' | 'nose'>
     >
     currentSelection: FeatureKey
 }) {
@@ -103,6 +103,12 @@ function MainMenu({
                 setCurrentSelectionMenu={setCurrentSelectionMenu}
                 currentSelection={currentSelection}
             />
+            <MainMenuItem
+                image="/images/nose/nose1.png"
+                name="nose"
+                setCurrentSelectionMenu={setCurrentSelectionMenu}
+                currentSelection={currentSelection}
+            />
         </div>
     )
 }
@@ -116,7 +122,7 @@ function MainMenuItem({
     image: string
     name: FeatureKey
     setCurrentSelectionMenu: React.Dispatch<
-        React.SetStateAction<'empty' | 'hair' | 'eyes' | 'mouth' | 'noses'>
+        React.SetStateAction<'empty' | 'hair' | 'eyes' | 'mouth' | 'nose'>
     >
     currentSelection: FeatureKey
 }) {
@@ -155,7 +161,6 @@ function SelectionMenu({
     if (!features) {
         return null
     }
-    console.log(`features for ${name}:`, features)
     return (
         <div className="feature-menu">
             {features.map((feature) => (
@@ -211,20 +216,34 @@ function SelectionMenuItem({
     )
 }
 
+let clickedElement: string | null = null
+let dragOffset: { x: number; y: number } | null = null
+let initialPosition: { x: number; y: number } | null = null
+
 function FaceRender({
     hair,
     eyes,
     mouth,
+    nose,
     mouthPosition,
+    setMouthPosition,
+    nosePosition,
+    setNosePosition,
     mouthSize,
+    noseSize,
     eyesSize,
     hsva,
 }: {
     hair: string
     eyes: string
     mouth: string
+    nose: string
     mouthPosition: number
+    setMouthPosition: React.Dispatch<React.SetStateAction<number>>
+    nosePosition: number
+    setNosePosition: React.Dispatch<React.SetStateAction<number>>
     mouthSize: number
+    noseSize: number
     eyesSize: number
     hsva: { h: number; s: number; v: number; a: number }
 }) {
@@ -232,6 +251,7 @@ function FaceRender({
     const eyesCvsRef = useRef<HTMLCanvasElement>(null)
     const hairCvsRef = useRef<HTMLCanvasElement>(null)
     const mouthCvsRef = useRef<HTMLCanvasElement>(null)
+    const noseCvsRef = useRef<HTMLCanvasElement>(null)
 
     useEffect(() => {
         const canvas = skinCvsRef.current
@@ -360,6 +380,138 @@ function FaceRender({
         }
     }, [mouth, mouthSize, mouthPosition, hsva])
 
+    useEffect(() => {
+        const canvas = noseCvsRef.current
+        if (!canvas) return
+        const context = canvas.getContext('2d')
+
+        if (!canvas || !context) return
+
+        const faceWidth = 500
+        const faceHeight = 500
+
+        const noseImage = new Image()
+        noseImage.src = `/images/nose/${nose}.png`
+
+        const width = noseSize * 10
+        const height = noseSize * 10
+        const xoffset = -(width - faceWidth) / 2
+        const yoffset = -(height - faceHeight) / 2 + 10 * nosePosition
+
+        const x = canvas.width / 2 - faceWidth / 2 + xoffset
+        const y = canvas.height / 2 - faceHeight / 2 + yoffset
+
+        noseImage.onload = () => {
+            context.clearRect(0, 0, canvas.width, canvas.height) // Clear the canvas
+
+            context.drawImage(noseImage, x, y, width, height)
+        }
+    }, [nose, nosePosition, noseSize])
+
+    // Handle clicks on either canvas, with priority and pixel testing
+    const handleClick = (event: MouseEvent) => {
+        const canvas = skinCvsRef.current as HTMLCanvasElement
+        const rect = canvas.getBoundingClientRect()
+        const x = event.clientX - rect.left
+        const y = event.clientY - rect.top
+
+        // Sample each canvas
+        const skinCanvas = skinCvsRef.current
+        const skinContext = skinCanvas?.getContext('2d')
+        const skinData = skinContext?.getImageData(x, y, 1, 1).data
+        const eyesCanvas = eyesCvsRef.current
+        const eyesContext = eyesCanvas?.getContext('2d')
+        const eyesData = eyesContext?.getImageData(x, y, 1, 1).data
+        const mouthCanvas = mouthCvsRef.current
+        const mouthContext = mouthCanvas?.getContext('2d')
+        const mouthData = mouthContext?.getImageData(x, y, 1, 1).data
+        const noseCanvas = noseCvsRef.current
+        const noseContext = noseCanvas?.getContext('2d')
+        const noseData = noseContext?.getImageData(x, y, 1, 1).data
+        const hairCanvas = hairCvsRef.current
+        const hairContext = hairCanvas?.getContext('2d')
+        const hairData = hairContext?.getImageData(x, y, 1, 1).data
+        // Check if the pixel is not transparent (alpha > 0)
+        const skinClicked = skinData && skinData[3] > 0
+        const eyesClicked = eyesData && eyesData[3] > 0
+        const mouthClicked = mouthData && mouthData[3] > 0
+        const noseClicked = noseData && noseData[3] > 0
+        const hairClicked = hairData && hairData[3] > 0
+
+        dragOffset = {
+            x: event.clientX - x,
+            y: event.clientY - y,
+        }
+
+        if (eyesClicked) {
+            clickedElement = 'eyes'
+        } else if (mouthClicked) {
+            clickedElement = 'mouth'
+            initialPosition = {
+                x: event.clientX - x,
+                y: mouthPosition,
+            }
+        } else if (noseClicked) {
+            clickedElement = 'nose'
+            initialPosition = {
+                x: event.clientX - x,
+                y: nosePosition,
+            }
+        } else if (hairClicked) {
+            clickedElement = 'hair'
+        } else if (skinClicked) {
+            clickedElement = 'skin'
+        } else {
+            clickedElement = null
+        }
+    }
+
+    const handleMove = (event: MouseEvent) => {
+        let displacement = {
+            x: event.clientX - (dragOffset?.x || 0) - 500,
+            y: event.clientY - (dragOffset?.y || 0) - 500,
+        }
+        if (!clickedElement) return
+        if (clickedElement === 'skin') return
+        if (clickedElement === 'mouth') {
+            setMouthPosition(((initialPosition?.y || 0) + displacement.y) / 10)
+        }
+        if (clickedElement === 'nose') {
+            setNosePosition(((initialPosition?.y || 0) + displacement.y) / 10)
+        }
+    }
+
+    const handleMouseUp = () => {
+        clickedElement = null
+    }
+
+    // Add event listeners for click and mouse move
+    useEffect(() => {
+        const hairCanvas = hairCvsRef.current
+        if (hairCanvas) {
+            hairCanvas.addEventListener(
+                'pointerdown',
+                handleClick as EventListener
+            )
+            document.addEventListener(
+                'pointermove',
+                handleMove as EventListener
+            )
+            document.addEventListener(
+                'pointerup',
+                handleMouseUp as EventListener
+            )
+        }
+        // Cleanup function to remove event listeners
+        return () => {
+            if (hairCanvas) {
+                hairCanvas.removeEventListener('pointerdown', handleClick)
+                document.removeEventListener('pointermove', handleMove)
+                document.removeEventListener('pointerup', handleMouseUp)
+            }
+        }
+    }, [hairCvsRef])
+
     return (
         <>
             <canvas
@@ -376,6 +528,12 @@ function FaceRender({
             />
             <canvas
                 ref={mouthCvsRef}
+                width={1000}
+                height={1000}
+                className="absolute"
+            />
+            <canvas
+                ref={noseCvsRef}
                 width={1000}
                 height={1000}
                 className="absolute"
@@ -404,10 +562,12 @@ export default function FaceDesign() {
     const [mouthPosition, setMouthPosition] = useState(5) // Position verticale en pourcentage
     const [mouthSize, setMouthSize] = useState(7) // Taille en pourcentage
     const [eyesSize, setEyesSize] = useState(13) // Taille en pourcentage
+    const [nosePosition, setNosePosition] = useState(5) // Position verticale en pourcentage
+    const [noseSize, setNoseSize] = useState(7) // Taille en pourcentage
 
     const [hsva, setHsva] = useState({
         h: 0,
-        s: 100,
+        s: 0,
         v: 100,
         a: 1,
     })
@@ -449,9 +609,14 @@ export default function FaceDesign() {
                     hair={current_face.hair}
                     eyes={current_face.eyes}
                     mouth={current_face.mouth}
+                    nose={current_face.nose}
+                    setMouthPosition={setMouthPosition}
+                    nosePosition={nosePosition}
+                    setNosePosition={setNosePosition}
                     // current_face={current_face}
                     mouthPosition={mouthPosition}
                     mouthSize={mouthSize}
+                    noseSize={noseSize}
                     eyesSize={eyesSize}
                     hsva={hsva}
                 />
@@ -511,12 +676,60 @@ export default function FaceDesign() {
                         <span>Taille des yeux :</span>
                         <input
                             type="range"
-                            min="5"
-                            max="18"
+                            min="10"
+                            max="25"
                             step="0.1"
                             value={eyesSize}
                             onChange={(e) =>
                                 setEyesSize(Number(e.target.value))
+                            }
+                            className="slider"
+                            style={{
+                                appearance: 'none',
+                                width: '100%',
+                                height: '8px',
+                                borderRadius: '5px',
+                                background: '#ddd',
+                                outline: 'none',
+                                opacity: '0.9',
+                                transition: 'opacity 0.2s',
+                            }}
+                        />
+                    </label>
+                    <label className="flex flex-col items-start">
+                        <span>Hauteur du nez :</span>
+                        <input
+                            type="range"
+                            min="-10"
+                            max="10"
+                            step="0.1"
+                            value={nosePosition}
+                            onChange={(e) =>
+                                setNosePosition(Number(e.target.value))
+                            }
+                            className="slider"
+                            style={{
+                                appearance: 'none',
+                                width: '100%',
+                                height: '8px',
+                                borderRadius: '5px',
+                                background: '#ddd',
+                                outline: 'none',
+                                opacity: '0.9',
+                                transition: 'opacity 0.2s',
+                            }}
+                        />
+                    </label>
+                    <label className="flex flex-col items-start">
+                        <span>Taille du nez :</span>
+                        <input
+                            type="range"
+                            min="3"
+                            max="10"
+                            step="0.1"
+                            value={noseSize}
+                            onChange={(e) =>
+                                setNoseSize(Number(e.target.value))
                             }
                             className="slider"
                             style={{
