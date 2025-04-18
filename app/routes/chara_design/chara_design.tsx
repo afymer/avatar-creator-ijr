@@ -22,7 +22,7 @@ type Face = {
 
 const FeaturesList = {
     empty: [],
-    hair: ['hair1', 'hair2'],
+    hair: ['hair1', 'hair2', 'hair3', 'hair4'],
     eyes: ['eyes1', 'eyes2', 'eyes3', 'eyes4'],
     mouth: ['mouth1', 'mouth2', 'mouth3', 'mouth4'],
     nose: ['nose1', 'nose2'],
@@ -312,11 +312,35 @@ function FaceRender({
         //                     transform: 'translate(-50%, -50%)',
         //                     height: current_face.hair === 'hair1' ? '40%' : '34%',
 
-        const width = hair === 'hair1' ? 600 : 500
-        const height = hair === 'hair1' ? 500 : 550
-        const xoffset = -(width - faceWidth) / 2
-        const yoffset =
-            -(height - faceHeight) / 2 + (hair === 'hair1' ? -50 : -60)
+        let width
+        let height
+        let dx
+        let dy
+
+        if (hair === 'hair1') {
+            width = 600
+            height = 500
+            dx = 0
+            dy = -50
+        } else if (hair === 'hair2') {
+            width = 500
+            height = 550
+            dx = 0
+            dy = -50
+        } else if (hair === 'hair3') {
+            width = 400
+            height = 400
+            dx = 0
+            dy = -180
+        } else {
+            width = 350
+            height = 400
+            dx = 0
+            dy = -200
+        }
+
+        const xoffset = -(width - faceWidth) / 2 + dx
+        const yoffset = -(height - faceHeight) / 2 + dy
 
         hairImage.onload = () => {
             context.clearRect(0, 0, canvas.width, canvas.height) // Clear the canvas
@@ -571,7 +595,7 @@ export default function FaceDesign() {
 
     // Nouveaux états pour la position verticale et la taille de la bouche
     const [mouthPosition, setMouthPosition] = useState(5) // Position verticale en pourcentage
-    const [nosePosition, setNosePosition] = useState(5) // Position verticale en pourcentage
+    const [nosePosition, setNosePosition] = useState(0) // Position verticale en pourcentage
     const [eyesPosition, setEyesPosition] = useState(0) // Position verticale en pourcentage
 
     const [mouthSize, setMouthSize] = useState(7) // Taille en pourcentage
