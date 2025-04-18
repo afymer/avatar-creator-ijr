@@ -1,6 +1,13 @@
 'use client'
 
-import React, { useEffect, useRef, useState, Fragment } from 'react'
+import React, {
+    useEffect,
+    useRef,
+    useState,
+    Fragment,
+    useCallback,
+    type PointerEventHandler,
+} from 'react'
 import Wheel from '@uiw/react-color-wheel'
 import { hsvaToHex } from '@uiw/color-convert'
 import './chara_design.css'
@@ -222,26 +229,38 @@ let initialPosition: { x: number; y: number } | null = null
 
 function FaceRender({
     hair,
+
     eyes,
+    eyesPosition,
+    setEyesPosition,
+
     mouth,
-    nose,
     mouthPosition,
     setMouthPosition,
+
+    nose,
     nosePosition,
     setNosePosition,
+
     mouthSize,
     noseSize,
     eyesSize,
     hsva,
 }: {
     hair: string
+
     eyes: string
+    eyesPosition: number
+    setEyesPosition: React.Dispatch<React.SetStateAction<number>>
+
     mouth: string
-    nose: string
     mouthPosition: number
     setMouthPosition: React.Dispatch<React.SetStateAction<number>>
+
+    nose: string
     nosePosition: number
     setNosePosition: React.Dispatch<React.SetStateAction<number>>
+
     mouthSize: number
     noseSize: number
     eyesSize: number
@@ -327,7 +346,7 @@ function FaceRender({
         const width = eyesSize * 10
         const height = eyesSize * 10
         const xoffset = -(width - faceWidth) / 2
-        const yoffset = -(height - faceHeight) / 2 - 50
+        const yoffset = -(height - faceHeight) / 2 + 10 * eyesPosition - 50
 
         const x = canvas.width / 2 - faceWidth / 2 + xoffset
         const y = canvas.height / 2 - faceHeight / 2 + yoffset
@@ -350,7 +369,7 @@ function FaceRender({
 
             context.drawImage(eyesImage, x, y, width, height)
         }
-    }, [eyes, eyesSize, hsva])
+    }, [eyes, eyesSize, eyesPosition, hsva])
 
     useEffect(() => {
         const canvas = mouthCvsRef.current
@@ -409,8 +428,12 @@ function FaceRender({
     }, [nose, nosePosition, noseSize])
 
     // Handle clicks on either canvas, with priority and pixel testing
-    const handleClick = (event: MouseEvent) => {
-        const canvas = skinCvsRef.current as HTMLCanvasElement
+    const handlePointerDown = (
+        event: React.PointerEvent<HTMLCanvasElement>
+    ) => {
+        // const handleClick = (event: Pointer) => {
+        // const canvas = skinCvsRef.current as HTMLCanvasElement
+        const canvas = event.currentTarget
         const rect = canvas.getBoundingClientRect()
         const x = event.clientX - rect.left
         const y = event.clientY - rect.top
@@ -439,23 +462,27 @@ function FaceRender({
         const hairClicked = hairData && hairData[3] > 0
 
         dragOffset = {
-            x: event.clientX - x,
-            y: event.clientY - y,
+            x: event.clientX,
+            y: event.clientY,
         }
 
         if (eyesClicked) {
             clickedElement = 'eyes'
-        } else if (mouthClicked) {
-            clickedElement = 'mouth'
             initialPosition = {
                 x: event.clientX - x,
-                y: mouthPosition,
+                y: eyesPosition,
             }
         } else if (noseClicked) {
             clickedElement = 'nose'
             initialPosition = {
                 x: event.clientX - x,
                 y: nosePosition,
+            }
+        } else if (mouthClicked) {
+            clickedElement = 'mouth'
+            initialPosition = {
+                x: event.clientX - x,
+                y: mouthPosition,
             }
         } else if (hairClicked) {
             clickedElement = 'hair'
@@ -466,51 +493,32 @@ function FaceRender({
         }
     }
 
-    const handleMove = (event: MouseEvent) => {
+    const handlePointerMove = (
+        event: React.PointerEvent<HTMLCanvasElement>
+    ) => {
         let displacement = {
-            x: event.clientX - (dragOffset?.x || 0) - 500,
-            y: event.clientY - (dragOffset?.y || 0) - 500,
+            x: event.clientX - (dragOffset?.x || 0),
+            y: event.clientY - (dragOffset?.y || 0),
         }
+        // console.log('displacement', displacement)
+        // console.log('initial position', initialPosition)
+
         if (!clickedElement) return
         if (clickedElement === 'skin') return
         if (clickedElement === 'mouth') {
-            setMouthPosition(((initialPosition?.y || 0) + displacement.y) / 10)
+            setMouthPosition((initialPosition?.y || 0) + displacement.y / 10)
         }
         if (clickedElement === 'nose') {
-            setNosePosition(((initialPosition?.y || 0) + displacement.y) / 10)
+            setNosePosition((initialPosition?.y || 0) + displacement.y / 10)
+        }
+        if (clickedElement === 'eyes') {
+            setEyesPosition((initialPosition?.y || 0) + displacement.y / 10)
         }
     }
 
     const handleMouseUp = () => {
         clickedElement = null
     }
-
-    // Add event listeners for click and mouse move
-    useEffect(() => {
-        const hairCanvas = hairCvsRef.current
-        if (hairCanvas) {
-            hairCanvas.addEventListener(
-                'pointerdown',
-                handleClick as EventListener
-            )
-            document.addEventListener(
-                'pointermove',
-                handleMove as EventListener
-            )
-            document.addEventListener(
-                'pointerup',
-                handleMouseUp as EventListener
-            )
-        }
-        // Cleanup function to remove event listeners
-        return () => {
-            if (hairCanvas) {
-                hairCanvas.removeEventListener('pointerdown', handleClick)
-                document.removeEventListener('pointermove', handleMove)
-                document.removeEventListener('pointerup', handleMouseUp)
-            }
-        }
-    }, [hairCvsRef])
 
     return (
         <>
@@ -543,6 +551,9 @@ function FaceRender({
                 width={1000}
                 height={1000}
                 className="absolute"
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handleMouseUp}
             />
         </>
     )
@@ -560,9 +571,11 @@ export default function FaceDesign() {
 
     // Nouveaux états pour la position verticale et la taille de la bouche
     const [mouthPosition, setMouthPosition] = useState(5) // Position verticale en pourcentage
+    const [nosePosition, setNosePosition] = useState(5) // Position verticale en pourcentage
+    const [eyesPosition, setEyesPosition] = useState(0) // Position verticale en pourcentage
+
     const [mouthSize, setMouthSize] = useState(7) // Taille en pourcentage
     const [eyesSize, setEyesSize] = useState(13) // Taille en pourcentage
-    const [nosePosition, setNosePosition] = useState(5) // Position verticale en pourcentage
     const [noseSize, setNoseSize] = useState(7) // Taille en pourcentage
 
     const [hsva, setHsva] = useState({
@@ -608,13 +621,15 @@ export default function FaceDesign() {
                 <FaceRender
                     hair={current_face.hair}
                     eyes={current_face.eyes}
+                    eyesPosition={eyesPosition}
+                    setEyesPosition={setEyesPosition}
                     mouth={current_face.mouth}
-                    nose={current_face.nose}
+                    mouthPosition={mouthPosition}
                     setMouthPosition={setMouthPosition}
+                    nose={current_face.nose}
                     nosePosition={nosePosition}
                     setNosePosition={setNosePosition}
                     // current_face={current_face}
-                    mouthPosition={mouthPosition}
                     mouthSize={mouthSize}
                     noseSize={noseSize}
                     eyesSize={eyesSize}
@@ -658,6 +673,30 @@ export default function FaceDesign() {
                             value={mouthSize}
                             onChange={(e) =>
                                 setMouthSize(Number(e.target.value))
+                            }
+                            className="slider"
+                            style={{
+                                appearance: 'none',
+                                width: '100%',
+                                height: '8px',
+                                borderRadius: '5px',
+                                background: '#ddd',
+                                outline: 'none',
+                                opacity: '0.9',
+                                transition: 'opacity 0.2s',
+                            }}
+                        />
+                    </label>
+                    <label className="flex flex-col items-start">
+                        <span>Hauteur des yeux :</span>
+                        <input
+                            type="range"
+                            min="-10"
+                            max="10"
+                            step="0.1"
+                            value={eyesPosition}
+                            onChange={(e) =>
+                                setEyesPosition(Number(e.target.value))
                             }
                             className="slider"
                             style={{
